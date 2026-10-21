@@ -2,15 +2,17 @@ package br.com.fooddelivery.domain.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -30,11 +32,4 @@ public class User {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
-
-//    public User(String name, String email, String password) {
-//        this.name = name;
-//        this.email = email;
-//        this.password = password;
-//        List<Order> orders = new ArrayList<>();
-//    }
 }

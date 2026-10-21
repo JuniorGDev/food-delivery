@@ -3,10 +3,12 @@ package br.com.fooddelivery.application.dto.request;
 import br.com.fooddelivery.domain.model.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateStatusRequest {
