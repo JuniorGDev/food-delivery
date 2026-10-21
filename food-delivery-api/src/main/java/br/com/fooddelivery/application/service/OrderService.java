@@ -8,6 +8,7 @@ import br.com.fooddelivery.application.dto.response.AddressResponse;
 import br.com.fooddelivery.application.dto.response.OrderItemResponse;
 import br.com.fooddelivery.application.dto.response.OrderResponse;
 import br.com.fooddelivery.domain.model.*;
+import br.com.fooddelivery.domain.repository.AddressRepository;
 import br.com.fooddelivery.domain.repository.OrderRepository;
 import br.com.fooddelivery.domain.repository.UserRepository;
 import br.com.fooddelivery.infrastructure.exception.EmptyOrderItemsException;
@@ -24,8 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final OrderRepository orderRepository;
+    private final OrderRepository repository;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
     @Transactional
     public OrderResponse createOrder(CreateOrderRequest request, Long userId) {
@@ -37,37 +39,37 @@ public class OrderService {
         }
 
         Address address = convertToAddress(request.getAddress());
-        List<OrderItem> items = request.getItems().stream()
-                .map(this::convertToOrderItem)
-                .collect(Collectors.toList());
+        Address savedAddress = addressRepository.save(address);
 
         Order order = new Order();
         order.setCustomer(customer);
-        order.setAddress(address);
-        order.setItems(items);
+        order.setAddress(savedAddress);
         order.setStatus(OrderStatus.RECEBIDO);
 
-        items.forEach(item -> item.setOrder(order));
+        request.getItems()
+                .stream()
+                .map(this::convertToOrderItem)
+                .forEach(order::addItem);
 
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = repository.save(order);
         return convertToOrderResponse(savedOrder);
     }
 
     public List<OrderResponse> listAllOrders() {
-        return orderRepository.findAll().stream()
+        return repository.findAll().stream()
                 .map(this::convertToOrderResponse)
                 .collect(Collectors.toList());
     }
 
     public OrderResponse getOrderById(Long id) {
-        Order order = orderRepository.findById(id)
+        Order order = repository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Pedido não encontrado"));
         return convertToOrderResponse(order);
     }
 
     @Transactional
     public OrderResponse updateOrderStatus(Long id, UpdateStatusRequest request) {
-        Order order = orderRepository.findById(id)
+        Order order = repository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Pedido não encontrado"));
 
         try {
@@ -76,7 +78,7 @@ public class OrderService {
             throw new InvalidOrderStatusException(e.getMessage());
         }
 
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = repository.save(order);
         return convertToOrderResponse(savedOrder);
     }
 

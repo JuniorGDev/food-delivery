@@ -1,6 +1,5 @@
 package br.com.fooddelivery.infrastructure.exception;
 
-import br.com.fooddelivery.infrastructure.exception.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
